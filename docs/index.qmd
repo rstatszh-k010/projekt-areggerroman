@@ -1,0 +1,23 @@
+```{r}
+library(tidyverse)
+```
+
+```{r}
+read_csv(here::here("daten/raw/ts-x-15.02.04.04_detail (2).csv"))
+```
+
+```{r}
+library(here)
+```
+
+# Einleitung
+
+kurz beschreiben des Projekts inkl. Daten und Analyseziele
+
+## Daten
+
+## Analyseziele
+
+# Daten Aufbereitung
+
+# Daten Visualisierung
