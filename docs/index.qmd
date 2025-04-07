@@ -3,7 +3,8 @@ library(tidyverse)
 ```
 
 ```{r}
-read_csv(here::here("daten/raw/ts-x-15.02.04.04_detail (2).csv"))
+daten_in <- read_csv(here::here("daten/raw/ts-x-15.02.04.04_detail (2).csv")) |>
+  janitor::clean_names()
 ```
 
 ```{r}
