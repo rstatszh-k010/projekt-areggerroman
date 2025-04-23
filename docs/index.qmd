@@ -1,5 +1,6 @@
 ```{r}
 library(tidyverse)
+library(janitor)
 ```
 
 ```{r}
@@ -9,6 +10,13 @@ daten_in <- read_csv(here::here("daten/raw/ts-x-15.02.04.04_detail (2).csv")) |>
 
 ```{r}
 library(here)
+```
+
+```{r}
+daten_in <- readODS(here::here("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods"))
+```
+
+```{}
 ```
 
 # Einleitung
