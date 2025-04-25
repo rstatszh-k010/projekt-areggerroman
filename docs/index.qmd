@@ -1,6 +1,8 @@
 ```{r}
 library(tidyverse)
 library(janitor)
+
+
 ```
 
 ```{r}
@@ -13,10 +15,17 @@ library(here)
 ```
 
 ```{r}
-daten_in <- readODS(here::here("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods"))
+#Paket installieren
+install.packages("readODS")
+
+# Paket aktivieren
+library("readODS")
+
+# ods-Datei ".ods" importieren
+daten_ods <- read_ods("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods", sheet = "period":"sex", range = "D1:D26")
 ```
 
-```{}
+```         
 ```
 
 # Einleitung
