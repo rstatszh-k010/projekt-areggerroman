@@ -1,13 +1,18 @@
+---
+title: "abschlussprojekt_areggerroman"
+format: html
+editor: visual
+---
+
 ```{r}
 library(tidyverse)
 library(janitor)
-
-
 ```
 
 ```{r}
 daten_in <- read_csv(here::here("daten/raw/ts-x-15.02.04.04_detail (2).csv")) |>
-  janitor::clean_names()
+  janitor::clean_names() |>
+  spec()
 ```
 
 ```{r}
@@ -25,7 +30,11 @@ library("readODS")
 daten_ods <- read_ods("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods", sheet = "period":"sex", range = "D1:D26")
 ```
 
-```         
+```{r}
+ggplot(data = daten_in,
+       mapping = aes(x = "sex",
+                     y = "period") +
+         geom_bar())
 ```
 
 # Einleitung
