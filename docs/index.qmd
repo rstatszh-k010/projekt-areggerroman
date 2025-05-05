@@ -4,9 +4,7 @@ format: html
 editor: visual
 editor_options: 
   chunk_output_type: console
---- 
-
-
+---
 
 ```{r}
 library(tidyverse)
@@ -18,32 +16,61 @@ library(here)
 
 ```{r}
 daten_in <- read_csv(here::here("daten/raw/ts-x-15.02.04.04_detail (2).csv")) |>
-  janitor::clean_names() |>
-  spec()
+  janitor::clean_names() 
 ```
 
 ```{r}
-
 # ods-Datei ".ods" importieren
-daten_ods <- read_ods("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods", sheet = "SEX") |> 
+code_sex <- read_ods("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods", sheet = "SEX") |> 
   select(CODE, LABEL_DE)
+
+code_uni <- read_ods("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods", sheet = "UNI") |> 
+  select(CODE, LABEL_DE)
+
+code_field <- read_ods("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods", sheet = "FIELD") |> 
+  select(CODE, LABEL_DE)
+
+code_level <- read_ods("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods", sheet = "LEVEL") |> 
+  select(CODE, LABEL_DE)
+
 ```
 
 ```{r}
 # daten transformation
 
-daten_in |> 
-  left_join(daten_ods, by = c("sex" = "CODE")) 
+daten_processed <- daten_in |> 
+  left_join(code_sex, by = c("sex" = "CODE")) |> 
+  select(-sex) |> 
+  rename(sex = LABEL_DE) |> 
+  left_join(code_uni, by = c("uni" = "CODE")) |> 
+  select(-uni) |> 
+  rename(uni = LABEL_DE) |> 
+  left_join(code_field, by = c("field" = "CODE")) |> 
+  select(-field) |> 
+  rename(field = LABEL_DE) |> 
+  left_join(code_level, by = c("level" = "CODE")) |> 
+  select(-level) |> 
+  rename(level = LABEL_DE)
+
 ```
+
 
 
 ```{r}
-ggplot(data = daten_in,
-       mapping = aes(x = "sex",
-                     y = "period") +
-         geom_bar())
-```
+daten_processed |> 
+  group_by(sex, period) |> 
+  summarise(count = sum(value)) |> 
+  ggplot(aes(x = period, y = count, color = sex, group = sex)) +
+  geom_point() +
+  geom_line()
 
+#Alternative zu vorangehendem Code
+daten_processed |> 
+  count(sex, period, wt = value) |> 
+  ggplot(aes(x = period, y = n, color = sex, group = sex)) +
+  geom_point() +
+  geom_line()
+```
 
 
 
