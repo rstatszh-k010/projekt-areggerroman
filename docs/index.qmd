@@ -2,11 +2,18 @@
 title: "abschlussprojekt_areggerroman"
 format: html
 editor: visual
----
+editor_options: 
+  chunk_output_type: console
+--- 
+
+
 
 ```{r}
 library(tidyverse)
 library(janitor)
+# Paket aktivieren
+library(readODS)
+library(here)
 ```
 
 ```{r}
@@ -16,19 +23,19 @@ daten_in <- read_csv(here::here("daten/raw/ts-x-15.02.04.04_detail (2).csv")) |>
 ```
 
 ```{r}
-library(here)
+
+# ods-Datei ".ods" importieren
+daten_ods <- read_ods("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods", sheet = "SEX") |> 
+  select(CODE, LABEL_DE)
 ```
 
 ```{r}
-#Paket installieren
-install.packages("readODS")
+# daten transformation
 
-# Paket aktivieren
-library("readODS")
-
-# ods-Datei ".ods" importieren
-daten_ods <- read_ods("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods", sheet = "period":"sex", range = "D1:D26")
+daten_in |> 
+  left_join(daten_ods, by = c("sex" = "CODE")) 
 ```
+
 
 ```{r}
 ggplot(data = daten_in,
@@ -36,6 +43,9 @@ ggplot(data = daten_in,
                      y = "period") +
          geom_bar())
 ```
+
+
+
 
 # Einleitung
 
