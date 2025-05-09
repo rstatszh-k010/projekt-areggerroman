@@ -50,7 +50,11 @@ daten_processed <- daten_in |>
   rename(field = LABEL_DE) |> 
   left_join(code_level, by = c("level" = "CODE")) |> 
   select(-level) |> 
-  rename(level = LABEL_DE)
+  rename(level = LABEL_DE) |> 
+  left_join(code_period, by = c("period" = "CODE")) |> 
+  select(-period) |> 
+  rename(period = LABEL_DE) |> 
+  
 ```
 
 ```{r}
@@ -82,12 +86,19 @@ daten_processed_projahr <- daten_processed |>
   group_by(field, sex) |>
   summarise(count =sum(value))
 
+#Installation Dplyr für Filterfunktionen
+install.packages("dplyr")
+library(dplyer) #ERRORMELDUNG?
 
-library(dplyer)
+daten_processed_projahr_neu <- daten_processed |> 
+  filter("period" == 2024/25)
+
+#ERRORMELDUNG?
+ggplot(data = daten_processed,
+            mapping = aes(x = sex,
+                          y = field))
 
 
-
-ggplot(data = )
 
 
 ```
@@ -95,7 +106,7 @@ ggplot(data = )
 
 # Einleitung
 
-kurz beschreiben des Projekts inkl. Daten und Analyseziele
+Das Ziel ist, aus Bildungsdatensatz einige Erkenntnisse zu gewinnen und diese grafisch darzustellen. Dies deckt sich mit meiner aktuellen Tätigkeit, wird hier aber mit einem öffentlichen Datensatz des Bundesamts für Statistik generiert. Der Datensatz soll Erkenntnisse darüber liefern, wie Männer und Frauen  Weiterbildungsstudiengänge an Schweizer Hochschulen besuchen, insbesondere auch im Hinblick auf verschiedene Themenfelder (fields). 
 
 ## Daten
 
