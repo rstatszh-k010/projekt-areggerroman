@@ -51,12 +51,10 @@ daten_processed <- daten_in |>
   left_join(code_level, by = c("level" = "CODE")) |> 
   select(-level) |> 
   rename(level = LABEL_DE)
-
 ```
 
-
-
 ```{r}
+#1. Versuch, Daten zusammenzustellen
 daten_processed |> 
   group_by(sex, period) |> 
   summarise(count = sum(value)) |> 
@@ -72,6 +70,27 @@ daten_processed |>
   geom_line()
 ```
 
+```{r}
+#Hier werden verschiedene Daten zusammengestellt, um Grafiken zu generieren
+#Wieviele Frauen und Männer studieren seit 2000/01 in unterschiedlichen Feldern?
+daten_processed |>
+  group_by(field, sex) |>
+  summarise(count =sum(value))
+
+#Wieviele Frauen und Männer studieren im letzten Jahr in unterschiedlichen Feldern?
+daten_processed_projahr <- daten_processed |>
+  group_by(field, sex) |>
+  summarise(count =sum(value))
+
+
+library(dplyer)
+
+
+
+ggplot(data = )
+
+
+```
 
 
 # Einleitung
