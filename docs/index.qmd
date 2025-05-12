@@ -98,31 +98,45 @@ library(dplyr)
 daten_processed_projahr_neu <- daten_processed |> 
   filter("period" == 2024/25)
 
-ggplot(data = daten_processed,
-       mapping = aes(x = sex,
-                    y = period)) +
-  geom_point()
-
-
-
-
-
-
-data$sex <- factor(data$sex, levels = c("Mann", "Frau"))
-
-ggplot(data = daten_processed, aes(x = period, y = value, fill = sex) +
-  geom_bar(stat = "identity", position = position_dodge(width = 0.8),
+#Mit der folgenden Grafik wird ersichtlich, wieviele studierende Männer und Frauen sich pro Studienjahr in einem Studium befinden und wie sich die Zahlen über die Jahre hinweg entwickelt haben.
+ggplot(data = daten_processed, aes(x = period, y = value, fill = sex)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.5),
            color = "black",
-           size = 0.1) +
+           size = 0) +
+  geom_text(aes(label = value), 
+            position = position_dodge(width = 0.5), 
+            vjust = -0.5,
+            color = "black") +
   labs(title = "Anzahl der Männer und Frauen pro Studienjahr",
        x = "Studienjahr",
        y = "Anzahl") +
   scale_fill_manual(values = c("Mann" = "blue", "Frau" = "red")) +
   theme_minimal()
 
+```
 
+
+
+
+
+```{r}
+#Mit dieser Grafik sehe ich, wie sich die Geschlechter innerhalb jedes Fachgebiets verhältnismässig verteilen.
+ggplot(daten_processed, aes(x = field, fill = sex)) +
+  geom_bar(position = "fill") +
+  labs(title = "Relative Verteilung der Geschlechter nach Fach",
+       x = "Fachgebiet", y = "Anteil") +
+  scale_y_continuous(labels = scales::percent) +
+  theme_minimal() +
+  coord_flip()
 
 ```
+
+
+
+
+
+
+
 
 
 # Einleitung
