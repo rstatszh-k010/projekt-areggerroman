@@ -86,18 +86,39 @@ daten_processed_projahr <- daten_processed |>
   group_by(field, sex) |>
   summarise(count =sum(value))
 
+#2. Versuch: Wieviele Frauen und Männer studieren im letzten Jahr in unterschiedlichen Feldern?
+daten_processed_projahr <- daten_processed |>
+  group_by(period, sex) |>
+  summarise(count =sum(value))
+
 #Installation Dplyr für Filterfunktionen
-install.packages("dplyr")
-library(dplyer) #ERRORMELDUNG?
+#install.packages("dplyr") -->entfernt, damit das Package nicht bei jedem Rendern neu geladen wird.
+library(dplyr)
 
 daten_processed_projahr_neu <- daten_processed |> 
   filter("period" == 2024/25)
 
-#ERRORMELDUNG?
 ggplot(data = daten_processed,
-            mapping = aes(x = sex,
-                          y = field))
+       mapping = aes(x = sex,
+                    y = period)) +
+  geom_point()
 
+
+
+
+
+
+data$sex <- factor(data$sex, levels = c("Mann", "Frau"))
+
+ggplot(data = daten_processed, aes(x = period, y = value, fill = sex) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8),
+           color = "black",
+           size = 0.1) +
+  labs(title = "Anzahl der Männer und Frauen pro Studienjahr",
+       x = "Studienjahr",
+       y = "Anzahl") +
+  scale_fill_manual(values = c("Mann" = "blue", "Frau" = "red")) +
+  theme_minimal()
 
 
 
