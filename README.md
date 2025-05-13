@@ -1,7 +1,7 @@
 # Abschlussprojekt rstatsZH
 
 **Datenquelle:** [Studierende an den Fachhochschulen und pädagogischen Hochschulen nach Jahr, Hochschule, Fachbereich, Studienstufe und Geschlecht](https://www.bfs.admin.ch/asset/de/ts-x-15.02.04.04_detail)  
-**Code**: [Quarto Datei](https://github.com/rstatszh-k010/projekt-areggerroman.blob/master/docs/index.qmd)
+**Code**: [Quarto Datei](https://github.com/rstatszh-k010/projekt-areggerroman.git)
 
 ## Projektbeschreibung
 
