@@ -20,18 +20,22 @@ daten_in <- read_csv(here::here("daten/raw/ts-x-15.02.04.04_detail (2).csv")) |>
 ```
 
 ```{r}
-# ods-Datei ".ods" importieren
-code_sex <- read_ods("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods", sheet = "SEX") |> 
+
+code_sex <- read_ods(here("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods"), sheet = "SEX") |>
   select(CODE, LABEL_DE)
 
-code_uni <- read_ods("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods", sheet = "UNI") |> 
+code_uni <- read_ods(here("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods"), sheet = "UNI") |>
   select(CODE, LABEL_DE)
 
-code_field <- read_ods("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods", sheet = "FIELD") |> 
+code_field <- read_ods(here("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods"), sheet = "FIELD") |>
   select(CODE, LABEL_DE)
 
-code_level <- read_ods("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods", sheet = "LEVEL") |> 
+code_level <- read_ods(here("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods"), sheet = "LEVEL") |>
   select(CODE, LABEL_DE)
+
+code_period <- read_ods(here("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods"), sheet = "PERIOD") |>
+  select(CODE, LABEL_DE)
+
 
 ```
 
@@ -53,7 +57,7 @@ daten_processed <- daten_in |>
   rename(level = LABEL_DE) |> 
   left_join(code_period, by = c("period" = "CODE")) |> 
   select(-period) |> 
-  rename(period = LABEL_DE) |> 
+  rename(period = LABEL_DE) 
   
 ```
 
@@ -75,30 +79,37 @@ daten_processed |>
 ```
 
 ```{r}
-#Hier werden verschiedene Daten zusammengestellt, um Grafiken zu generieren
-#Wieviele Frauen und Männer studieren seit 2000/01 in unterschiedlichen Feldern?
-daten_processed |>
+# Hier werden verschiedene Daten zusammengestellt, um Grafiken zu generieren
+# Wieviele Frauen und Männer studieren seit 2000/01 in unterschiedlichen Feldern?
+daten_processed_field_sex <- daten_processed |>
   group_by(field, sex) |>
-  summarise(count =sum(value))
-
-#Wieviele Frauen und Männer studieren im letzten Jahr in unterschiedlichen Feldern?
-daten_processed_projahr <- daten_processed |>
-  group_by(field, sex) |>
-  summarise(count =sum(value))
+  summarise(count = sum(value)) |> 
+  mutate(prozent = count / sum(count)) 
 
 #2. Versuch: Wieviele Frauen und Männer studieren im letzten Jahr in unterschiedlichen Feldern?
 daten_processed_projahr <- daten_processed |>
   group_by(period, sex) |>
-  summarise(count =sum(value))
+  summarise(count = sum(value))
 
-#Installation Dplyr für Filterfunktionen
-#install.packages("dplyr") -->entfernt, damit das Package nicht bei jedem Rendern neu geladen wird.
-library(dplyr)
+## Werte für period Variable
 
-daten_processed_projahr_neu <- daten_processed |> 
-  filter("period" == 2024/25)
+daten_processed |> 
+  distinct(period) 
+
+## Wenn du auf 2024/25 filtern möchtest, dann kannst du das folgendermassen machen. Es ist eine character Variable. Deshalb auf den genauen Namen filtern mit "".
+daten_processed_jahr_202425 <- daten_processed |> 
+  filter(period == "Studienjahr 2024/25")
+
+
+```
+
+
+```{r}
 
 #Mit der folgenden Grafik wird ersichtlich, wieviele studierende Männer und Frauen sich pro Studienjahr in einem Studium befinden und wie sich die Zahlen über die Jahre hinweg entwickelt haben.
+
+# Diese Grafik gibt dir nicht die Summe über alle Geschlechter, sondern hat noch die einzelnen Punkte für uni, feld und level. Du siehst es nicht, weil die Daten Balken sich überlappen. Es wird etwas deutlicher wenn du ein geom_point() nutzt. Ich habe es dir hinzugefügt. Wenn du die Daten über die Studienjahre (period) und Geschlechter (sex) grafisch darstellen möchtest, dann musst du die Daten erst auf die beiden Variablen zusammenfassen. Das hast du auch bereits gemacht und das Ergebnis ist in deinem Daten-Objekt (daten_processed_projahr)
+
 ggplot(data = daten_processed, aes(x = period, y = value, fill = sex)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.5),
            color = "black",
@@ -113,14 +124,38 @@ ggplot(data = daten_processed, aes(x = period, y = value, fill = sex)) +
   scale_fill_manual(values = c("Mann" = "blue", "Frau" = "red")) +
   theme_minimal()
 
+# Grafik als geim_point().
+ggplot(data = daten_processed, aes(x = period, y = value, color = sex)) +
+  geom_point() 
+
+
+# Hier werden deine zusammegefassten Daten (daten_processed_projahr) verwendet. Beachte die Grösse der Zahlen auf der x-Achse. Du siehst die Werte nun aufsummiert über period und sex.
+ggplot(data = daten_processed_projahr,
+       mapping = aes(x = period, y = count, fill = sex)) +
+  geom_col(position = position_dodge()) 
+
+# Als geom_point
+ggplot(data = daten_processed_projahr,
+       mapping = aes(x = period, y = count, color = sex, group = sex)) +
+  geom_point() +
+  geom_line() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+  
 ```
 
 
 
-
-
 ```{r}
-#Mit dieser Grafik sehe ich, wie sich die Geschlechter innerhalb jedes Fachgebiets verhältnismässig verteilen.
+
+# Auch in dieser Grafik musst du die aufsummierung zunächst selbst machen. Ich empfehle dir grundsätzlich mit geom_col() zu arbeiten für Säulendiagramme. geom_bar() macht eine Transformation für dich. Du gibst die x-Achse vor (field) und geom_bar() zähle dann die Häufigkeiten. Das ist nicht das, was du hier möchtest und deshalb ist auch das Verhältnis ausgeglichen, da du lediglich die Anzahl Datenpunkte zählst. Siehe Code mit count(field), welches anzeigt was du visualisierst.
+
+# inkorrekt
+daten_processed |> 
+  count(field, sex)
+
+# den korrekten Code hast du bereits zuvor geschrieben und das Ergebnis ist im Datenobjekt daten_processed_field_sex. Ich habe zwei weitere Grafiken erstellt. Einmal mit der Variable count, welches die Summe angibt und einmal mit der Variable prozent, welche die relative Verteilung zeigt. Dasd Prozent habe ich noch für dich zum datensatz hinzugefügt.
+
+# Mit dieser Grafik sehe ich, wie sich die Geschlechter innerhalb jedes Fachgebiets verhältnismässig verteilen.
 ggplot(daten_processed, aes(x = field, fill = sex)) +
   geom_bar(position = "fill") +
   labs(title = "Relative Verteilung der Geschlechter nach Fach",
@@ -129,14 +164,38 @@ ggplot(daten_processed, aes(x = field, fill = sex)) +
   theme_minimal() +
   coord_flip()
 
+# Grafik mit Daten-Objekt daten_processed_field_sex als aufsummierung
+
+ggplot(data = daten_processed_field_sex,
+       mapping = aes(x = field, y = count, fill = sex)) +
+  geom_col() +
+  coord_flip()
+
+# Grafik mit Prozent für relative Verteilung
+
+ggplot(data = daten_processed_field_sex,
+       mapping = aes(x = field, y = prozent, fill = sex)) +
+  geom_col() +
+  coord_flip() +
+  scale_y_continuous(labels = scales::percent)
+
+# Alternative aufsummiert und geordnet
+
+ggplot(data = daten_processed_field_sex,
+       mapping = aes(x = reorder(field, count), y = count, fill = sex)) +
+  geom_col() +
+  coord_flip() +
+  scale_y_continuous(labels = scales::comma)
+
+# Aufsummiert, geordnet und dodge
+
+ggplot(data = daten_processed_field_sex,
+       mapping = aes(x = reorder(field, count), y = count, fill = sex)) +
+  geom_col(position = position_dodge()) +
+  coord_flip() +
+  scale_y_continuous(labels = scales::comma)
+
 ```
-
-
-
-
-
-
-
 
 
 # Einleitung
