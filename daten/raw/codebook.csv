@@ -1,2 +1,7 @@
 variable_name, beschreibung
 period, Von Studienjahr 2000/01 bis 2024/25.
+uni, Die einzelnen Hochschulen der Schweiz.
+field, Die einzelnen Fachbereiche der Hochschulen.
+level, Die einzelnen Studienstufen der Aus- und Weiterbildung.
+sex, Das Geschlecht der Studierenden.
+value, Die Anzahl Studierender.
