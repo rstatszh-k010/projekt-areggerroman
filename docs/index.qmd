@@ -146,7 +146,18 @@ bar_plot_period_sex <- ggplot(data = daten_processed_projahr,
        mapping = aes(x = period, y = count, color = sex, group = sex)) +
   geom_point() +
   geom_line() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+        plot.title = element_text(hjust = 0.5)) +
+  scale_x_discrete(labels = function(x) sub("Studienjahr ", "", x)) +
+  scale_y_continuous(
+    breaks = seq(0, 60000, by = 5000),
+    limits = c(0, 60000)) +
+  labs(
+    title = "Anzahl Studierende pro Studienjahr und nach Geschlecht",
+    x = "Studienjahr",
+    y = "Anzahl",
+    color = "Geschlecht"
+  )
   
 ```
 
@@ -198,9 +209,21 @@ ggplot(data = daten_processed_field_sex,
 
 bar_plot_field_sex <- ggplot(data = daten_processed_field_sex,
        mapping = aes(x = reorder(field, count), y = count, fill = sex)) +
-  geom_col(position = position_dodge()) +
+  geom_col(position = position_dodge(width = 0.9)) +
+  geom_text(aes(label = count),
+            position = position_dodge(width = 0.9),
+            vjust = 0.5,
+            hjust = -0.1,
+            color = "black",
+            size = 3) +
   coord_flip() +
-  scale_y_continuous(labels = scales::comma)
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "Anzahl Studierende nach Fachbereich und Geschlecht",
+  x = "Fachbereich",
+  y = "Anzahl",
+  fill = "Geschlecht") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
 
 ```
 
@@ -226,14 +249,13 @@ Aus dem Datensatz sollen Erkenntnisse generiert werden, wie Männer und Frauen A
 ```{r}
 bar_plot_period_sex
 
-
 ```
 
 
 
 ```{r}
-bar_plot_field_sex
 
+bar_plot_field_sex
 
 ```
 
