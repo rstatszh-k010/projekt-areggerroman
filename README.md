@@ -5,7 +5,7 @@
 
 ## Projektbeschreibung
 
--Das Ziel ist, aus dem Bildungsdatensatz des Bundesamts für Statistik (BFS) "Studierende an den Fachhochschulen und pädagogischen Hochschulen nach Jahr, Hochschule, Fachbereich, Studienstufe und Geschlecht" vom 27.03.2025 Erkenntnisse zu gewinnen und diese grafisch darzustellen. Dies deckt sich mit meiner aktuellen Tätigkeit, wird hier aber mit einem öffentlichen Datensatz des Bundesamts für Statistik generiert.
+Das Ziel ist, aus dem Bildungsdatensatz des Bundesamts für Statistik (BFS) "Studierende an den Fachhochschulen und pädagogischen Hochschulen nach Jahr, Hochschule, Fachbereich, Studienstufe und Geschlecht" vom 27.03.2025 Erkenntnisse zu gewinnen und diese grafisch darzustellen. Dies deckt sich mit meiner aktuellen Tätigkeit, wird hier aber mit einem öffentlichen Datensatz des Bundesamts für Statistik generiert.
 
 ## Daten
 
