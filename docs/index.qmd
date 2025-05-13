@@ -1,6 +1,10 @@
 ---
 title: "abschlussprojekt_areggerroman"
-format: html
+author: areggerroman
+date: "`r format(Sys.Date(), '%d. %B %Y')`"
+format: 
+  html:
+    toc: true
 editor: visual
 editor_options: 
   chunk_output_type: console
@@ -8,7 +12,7 @@ editor_options:
 
 ```{r}
 library(tidyverse)
-library(janitor)
+library(janitor) #Bietet Funktionen zur Datenbereinigung und -vorbereitung vereinfachen.
 # Paket aktivieren
 library(readODS)
 library(here)
@@ -17,9 +21,12 @@ library(here)
 ```{r}
 daten_in <- read_csv(here::here("daten/raw/ts-x-15.02.04.04_detail (2).csv")) |>
   janitor::clean_names() 
+
+#Bereinigung des csv-Datensatzes
 ```
 
 ```{r}
+#Spaltenbeschriftungen aus ods-Datei in csv-Datensatz einfügen
 
 code_sex <- read_ods(here("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods"), sheet = "SEX") |>
   select(CODE, LABEL_DE)
@@ -40,7 +47,7 @@ code_period <- read_ods(here("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods"), 
 ```
 
 ```{r}
-# daten transformation
+# Daten transformieren
 
 daten_processed <- daten_in |> 
   left_join(code_sex, by = c("sex" = "CODE")) |> 
@@ -92,7 +99,7 @@ daten_processed_projahr <- daten_processed |>
   summarise(count = sum(value))
 
 ## Werte für period Variable
-
+## distinct durchsucht die Spalte period und gibt nur die einzigartigen Werte zurück
 daten_processed |> 
   distinct(period) 
 
@@ -108,7 +115,7 @@ daten_processed_jahr_202425 <- daten_processed |>
 
 #Mit der folgenden Grafik wird ersichtlich, wieviele studierende Männer und Frauen sich pro Studienjahr in einem Studium befinden und wie sich die Zahlen über die Jahre hinweg entwickelt haben.
 
-# Diese Grafik gibt dir nicht die Summe über alle Geschlechter, sondern hat noch die einzelnen Punkte für uni, feld und level. Du siehst es nicht, weil die Daten Balken sich überlappen. Es wird etwas deutlicher wenn du ein geom_point() nutzt. Ich habe es dir hinzugefügt. Wenn du die Daten über die Studienjahre (period) und Geschlechter (sex) grafisch darstellen möchtest, dann musst du die Daten erst auf die beiden Variablen zusammenfassen. Das hast du auch bereits gemacht und das Ergebnis ist in deinem Daten-Objekt (daten_processed_projahr)
+# Diese Grafik gibt dir nicht die Summe über alle Geschlechter, sondern hat noch die einzelnen Punkte für uni, field und level. Du siehst es nicht, weil die Daten Balken sich überlappen. Es wird etwas deutlicher wenn du ein geom_point() nutzt. Ich habe es dir hinzugefügt. Wenn du die Daten über die Studienjahre (period) und Geschlechter (sex) grafisch darstellen möchtest, dann musst du die Daten erst auf die beiden Variablen zusammenfassen. Das hast du auch bereits gemacht und das Ergebnis ist in deinem Daten-Objekt (daten_processed_projahr)
 
 ggplot(data = daten_processed, aes(x = period, y = value, fill = sex)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.5),
@@ -124,7 +131,7 @@ ggplot(data = daten_processed, aes(x = period, y = value, fill = sex)) +
   scale_fill_manual(values = c("Mann" = "blue", "Frau" = "red")) +
   theme_minimal()
 
-# Grafik als geim_point().
+# Grafik als geom_point().
 ggplot(data = daten_processed, aes(x = period, y = value, color = sex)) +
   geom_point() 
 
@@ -146,8 +153,8 @@ ggplot(data = daten_processed_projahr,
 
 
 ```{r}
-
 # Auch in dieser Grafik musst du die aufsummierung zunächst selbst machen. Ich empfehle dir grundsätzlich mit geom_col() zu arbeiten für Säulendiagramme. geom_bar() macht eine Transformation für dich. Du gibst die x-Achse vor (field) und geom_bar() zähle dann die Häufigkeiten. Das ist nicht das, was du hier möchtest und deshalb ist auch das Verhältnis ausgeglichen, da du lediglich die Anzahl Datenpunkte zählst. Siehe Code mit count(field), welches anzeigt was du visualisierst.
+# geom_col erfordert im Gegensatz zu geom_bar, dass die Höhe der Balken explizit angegeben wird (z.B. mit y = wert). geom_bar berechnet automatisch die Höhe der Balken anhand der Häufigkeit (Count).
 
 # inkorrekt
 daten_processed |> 
@@ -164,7 +171,7 @@ ggplot(daten_processed, aes(x = field, fill = sex)) +
   theme_minimal() +
   coord_flip()
 
-# Grafik mit Daten-Objekt daten_processed_field_sex als aufsummierung
+# Grafik mit Daten-Objekt daten_processed_field_sex als Aufsummierung
 
 ggplot(data = daten_processed_field_sex,
        mapping = aes(x = field, y = count, fill = sex)) +
@@ -189,7 +196,7 @@ ggplot(data = daten_processed_field_sex,
 
 # Aufsummiert, geordnet und dodge
 
-ggplot(data = daten_processed_field_sex,
+bar_plot_field_sex <- ggplot(data = daten_processed_field_sex,
        mapping = aes(x = reorder(field, count), y = count, fill = sex)) +
   geom_col(position = position_dodge()) +
   coord_flip() +
@@ -209,3 +216,8 @@ Das Ziel ist, aus Bildungsdatensatz einige Erkenntnisse zu gewinnen und diese gr
 # Daten Aufbereitung
 
 # Daten Visualisierung
+
+```{r}
+bar_plot_field_sex + theme_minimal()
+```
+
