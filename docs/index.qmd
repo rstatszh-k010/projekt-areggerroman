@@ -240,16 +240,18 @@ Die Daten "Studierende an den Fachhochschulen und pädagogischen Hochschulen nac
 ## Analyseziele
 
 Aus dem Datensatz werden folgende Erkenntnisse generiert:
+
 1. Wie viele Männer und Frauen besuchen Aus- und Weiterbildungsstudiengänge an Schweizer Hochschulen pro Studienjahr?
 2. Wie viele Männer und Frauen besuchen verschiedene Fachbereiche in Aus- und Weiterbildungsstudiengängen?
 
 # Daten Aufbereitung
 
 In den Zeilen 14 bis 79 befindet sich die Datenaufbereitung:
-a) Datenpakete installieren
-b) .csv-Datensatz hochladen und bereinigen
-c) Spaltenbeschriftungen aus .ods-Datei in .csv-Datensatz einfügen
-d) Daten transformieren und zusammenstellen (daten_processed)
+
+- a) Datenpakete installieren
+- b) .csv-Datensatz hochladen und bereinigen
+- c) Spaltenbeschriftungen aus .ods-Datei in .csv-Datensatz einfügen
+- d) Daten transformieren und zusammenstellen (daten_processed)
 
 
 # Daten Visualisierung
