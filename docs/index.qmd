@@ -1,20 +1,22 @@
 ---
-title: "abschlussprojekt_areggerroman"
+title: "Abschlussprojekt"
 author: areggerroman
 date: "`r format(Sys.Date(), '%d. %B %Y')`"
 format: 
   html:
     toc: true
+execute:
+  echo: true
+  warning: false
 editor: visual
 editor_options: 
   chunk_output_type: console
 ---
-
+<script defer data-domain="rstatszh-k010.github.io" src="https://plausible.io/js/script.file-downloads.js"></script>
 
 ```{r}
 library(tidyverse)
-library(janitor) #Bietet Funktionen zur Datenbereinigung und -vorbereitung vereinfachen.
-# Paket aktivieren
+library(janitor) 
 library(readODS)
 library(here)
 ```
@@ -23,11 +25,10 @@ library(here)
 daten_in <- read_csv(here::here("daten/raw/ts-x-15.02.04.04_detail (2).csv")) |>
   janitor::clean_names() 
 
-#Bereinigung des csv-Datensatzes
 ```
 
 ```{r}
-#Spaltenbeschriftungen aus ods-Datei in csv-Datensatz einfügen
+# Spaltenbeschriftungen aus ods-Datei in csv-Datensatz einfügen
 
 code_sex <- read_ods(here("daten/raw/ts-x-15.02.04.04_detail-APPENDIX.ods"), sheet = "SEX") |>
   select(CODE, LABEL_DE)
@@ -70,23 +71,6 @@ daten_processed <- daten_in |>
 ```
 
 ```{r}
-#1. Versuch, Daten zusammenzustellen
-daten_processed |> 
-  group_by(sex, period) |> 
-  summarise(count = sum(value)) |> 
-  ggplot(aes(x = period, y = count, color = sex, group = sex)) +
-  geom_point() +
-  geom_line()
-
-#Alternative zu vorangehendem Code
-daten_processed |> 
-  count(sex, period, wt = value) |> 
-  ggplot(aes(x = period, y = n, color = sex, group = sex)) +
-  geom_point() +
-  geom_line()
-```
-
-```{r}
 # Hier werden verschiedene Daten zusammengestellt, um Grafiken zu generieren
 # Wieviele Frauen und Männer studieren seit 2000/01 in unterschiedlichen Feldern?
 daten_processed_field_sex <- daten_processed |>
@@ -94,55 +78,17 @@ daten_processed_field_sex <- daten_processed |>
   summarise(count = sum(value)) |> 
   mutate(prozent = count / sum(count)) 
 
-#2. Versuch: Wieviele Frauen und Männer studieren im letzten Jahr in unterschiedlichen Feldern?
+# Wieviele Frauen und Männer studieren in den einzelnen Jahren?
+
 daten_processed_projahr <- daten_processed |>
   group_by(period, sex) |>
   summarise(count = sum(value))
 
-## Werte für period Variable
-## distinct durchsucht die Spalte period und gibt nur die einzigartigen Werte zurück
-daten_processed |> 
-  distinct(period) 
-
-## Wenn du auf 2024/25 filtern möchtest, dann kannst du das folgendermassen machen. Es ist eine character Variable. Deshalb auf den genauen Namen filtern mit "".
-daten_processed_jahr_202425 <- daten_processed |> 
-  filter(period == "Studienjahr 2024/25")
-
 
 ```
 
-
 ```{r}
 
-#Mit der folgenden Grafik wird ersichtlich, wieviele studierende Männer und Frauen sich pro Studienjahr in einem Studium befinden und wie sich die Zahlen über die Jahre hinweg entwickelt haben.
-
-# Diese Grafik gibt dir nicht die Summe über alle Geschlechter, sondern hat noch die einzelnen Punkte für uni, field und level. Du siehst es nicht, weil die Daten Balken sich überlappen. Es wird etwas deutlicher wenn du ein geom_point() nutzt. Ich habe es dir hinzugefügt. Wenn du die Daten über die Studienjahre (period) und Geschlechter (sex) grafisch darstellen möchtest, dann musst du die Daten erst auf die beiden Variablen zusammenfassen. Das hast du auch bereits gemacht und das Ergebnis ist in deinem Daten-Objekt (daten_processed_projahr)
-
-ggplot(data = daten_processed, aes(x = period, y = value, fill = sex)) +
-  geom_bar(stat = "identity", position = position_dodge(width = 0.5),
-           color = "black",
-           size = 0) +
-  geom_text(aes(label = value), 
-            position = position_dodge(width = 0.5), 
-            vjust = -0.5,
-            color = "black") +
-  labs(title = "Anzahl der Männer und Frauen pro Studienjahr",
-       x = "Studienjahr",
-       y = "Anzahl") +
-  scale_fill_manual(values = c("Mann" = "blue", "Frau" = "red")) +
-  theme_minimal()
-
-# Grafik als geom_point().
-ggplot(data = daten_processed, aes(x = period, y = value, color = sex)) +
-  geom_point() 
-
-
-# Hier werden deine zusammegefassten Daten (daten_processed_projahr) verwendet. Beachte die Grösse der Zahlen auf der x-Achse. Du siehst die Werte nun aufsummiert über period und sex.
-ggplot(data = daten_processed_projahr,
-       mapping = aes(x = period, y = count, fill = sex)) +
-  geom_col(position = position_dodge()) 
-
-# Als geom_point
 bar_plot_period_sex <- ggplot(data = daten_processed_projahr,
        mapping = aes(x = period, y = count, color = sex, group = sex)) +
   geom_point() +
@@ -162,52 +108,7 @@ bar_plot_period_sex <- ggplot(data = daten_processed_projahr,
   
 ```
 
-
-
 ```{r}
-# Auch in dieser Grafik musst du die aufsummierung zunächst selbst machen. Ich empfehle dir grundsätzlich mit geom_col() zu arbeiten für Säulendiagramme. geom_bar() macht eine Transformation für dich. Du gibst die x-Achse vor (field) und geom_bar() zähle dann die Häufigkeiten. Das ist nicht das, was du hier möchtest und deshalb ist auch das Verhältnis ausgeglichen, da du lediglich die Anzahl Datenpunkte zählst. Siehe Code mit count(field), welches anzeigt was du visualisierst.
-# geom_col erfordert im Gegensatz zu geom_bar, dass die Höhe der Balken explizit angegeben wird (z.B. mit y = wert). geom_bar berechnet automatisch die Höhe der Balken anhand der Häufigkeit (Count).
-
-# inkorrekt
-daten_processed |> 
-  count(field, sex)
-
-# den korrekten Code hast du bereits zuvor geschrieben und das Ergebnis ist im Datenobjekt daten_processed_field_sex. Ich habe zwei weitere Grafiken erstellt. Einmal mit der Variable count, welches die Summe angibt und einmal mit der Variable prozent, welche die relative Verteilung zeigt. Dasd Prozent habe ich noch für dich zum datensatz hinzugefügt.
-
-# Mit dieser Grafik sehe ich, wie sich die Geschlechter innerhalb jedes Fachgebiets verhältnismässig verteilen.
-ggplot(daten_processed, aes(x = field, fill = sex)) +
-  geom_bar(position = "fill") +
-  labs(title = "Relative Verteilung der Geschlechter nach Fach",
-       x = "Fachgebiet", y = "Anteil") +
-  scale_y_continuous(labels = scales::percent) +
-  theme_minimal() +
-  coord_flip()
-
-# Grafik mit Daten-Objekt daten_processed_field_sex als Aufsummierung
-
-ggplot(data = daten_processed_field_sex,
-       mapping = aes(x = field, y = count, fill = sex)) +
-  geom_col() +
-  coord_flip()
-
-# Grafik mit Prozent für relative Verteilung
-
-ggplot(data = daten_processed_field_sex,
-       mapping = aes(x = field, y = prozent, fill = sex)) +
-  geom_col() +
-  coord_flip() +
-  scale_y_continuous(labels = scales::percent)
-
-# Alternative aufsummiert und geordnet
-
-ggplot(data = daten_processed_field_sex,
-       mapping = aes(x = reorder(field, count), y = count, fill = sex)) +
-  geom_col() +
-  coord_flip() +
-  scale_y_continuous(labels = scales::comma)
-
-# Aufsummiert, geordnet und dodge
-
 bar_plot_field_sex <- ggplot(data = daten_processed_field_sex,
        mapping = aes(x = reorder(field, count), y = count, fill = sex)) +
   geom_col(position = position_dodge(width = 0.9)) +
@@ -228,31 +129,38 @@ bar_plot_field_sex <- ggplot(data = daten_processed_field_sex,
 
 ```
 
-
 # Einleitung
 
 Das Ziel ist, aus dem Bildungsdatensatz des Bundesamts für Statistik (BFS) "Studierende an den Fachhochschulen und pädagogischen Hochschulen nach Jahr, Hochschule, Fachbereich, Studienstufe und Geschlecht" vom 27.03.2025 Erkenntnisse zu gewinnen und diese grafisch darzustellen. Dies deckt sich mit meiner aktuellen Tätigkeit, wird hier aber mit einem öffentlichen Datensatz des Bundesamts für Statistik generiert.
 
 ## Daten
 
-Die Daten "Studierende an den Fachhochschulen und pädagogischen Hochschulen nach Jahr, Hochschule, Fachbereich, Studienstufe und Geschlecht" stammen vom Bundesamt für Statistik. Die entsprechende .csv-Datei und die dazugehörende .ods-Datei sind unter folgendem Link öffentlich zugänglich: https://www.bfs.admin.ch/asset/de/ts-x-15.02.04.04_detail. 
+Die Daten "Studierende an den Fachhochschulen und pädagogischen Hochschulen nach Jahr, Hochschule, Fachbereich, Studienstufe und Geschlecht" stammen vom Bundesamt für Statistik. Die entsprechende .csv-Datei und die dazugehörende .ods-Datei sind unter folgendem Link öffentlich zugänglich: https://www.bfs.admin.ch/asset/de/ts-x-15.02.04.04_detail.
 
 ## Analyseziele
 
 Aus dem Datensatz werden folgende Erkenntnisse generiert:
 
-1. Wie viele Männer und Frauen besuchen Aus- und Weiterbildungsstudiengänge an Schweizer Hochschulen pro Studienjahr?
-2. Wie viele Männer und Frauen besuchen verschiedene Fachbereiche in Aus- und Weiterbildungsstudiengängen?
+1.  Wie viele Männer und Frauen besuchen Aus- und Weiterbildungsstudiengänge an Schweizer Hochschulen pro Studienjahr?
+2.  Wie viele Männer und Frauen besuchen verschiedene Fachbereiche in Aus- und Weiterbildungsstudiengängen?
 
 # Daten Aufbereitung
 
-In den Zeilen 14 bis 79 befindet sich die Datenaufbereitung:
+-   
 
-- a) Datenpakete installieren
-- b) .csv-Datensatz hochladen und bereinigen
-- c) Spaltenbeschriftungen aus .ods-Datei in .csv-Datensatz einfügen
-- d) Daten transformieren und zusammenstellen (daten_processed)
+    a)  Datenpakete installieren
 
+-   
+
+    b)  .csv-Datensatz hochladen und bereinigen
+
+-   
+
+    c)  Spaltenbeschriftungen aus .ods-Datei in .csv-Datensatz einfügen
+
+-   
+
+    d)  Daten transformieren und zusammenstellen (daten_processed)
 
 # Daten Visualisierung
 
@@ -267,7 +175,3 @@ bar_plot_period_sex +
 bar_plot_field_sex
 
 ```
-
-
-
-
